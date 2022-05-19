@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Kenjis\CI3Compatible\Core\CI_Model;
+use Kenjis\CI3Compatible\Database\CI_DB_query_builder;
+
+/**
+ * @property CI_DB_query_builder $db
+ */
+class Cart_model extends CI_Model
+{
+    public function getProductById($id)
+    {
+        return $this->db->get_where('products', ['id' => $id])->row_array();
+    }
+
+    public function addToCart($data): void
+    {
+        $this->db->insert('cart', $data);
+    }
+
+    public function showCart($id)
+    {
+        $this->db->select('cart.*, products.name, products.price, products.image');
+        $this->db->from('cart');
+        $this->db->join('products', 'cart.product_id = products.id');
+        $this->db->where('cart.user_id', $id);
+
+        return $this->db->get()->result_array();
+    }
+
+    public function deleteCart($id)
+    {
+        $this->db->delete('cart', ['id' => $id]);
+
+        return $this->db->affected_rows();
+    }
+}
+
+/* End of file Cart_model.php */
